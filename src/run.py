@@ -5,8 +5,9 @@ Presence analyzer web app.
 import os.path
 import logging.config
 
-from presence_analyzer.main import app
 import presence_analyzer.views
+
+from presence_analyzer.main import app
 
 
 if __name__ == "__main__":
