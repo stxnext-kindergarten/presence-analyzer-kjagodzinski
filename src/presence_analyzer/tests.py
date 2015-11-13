@@ -111,6 +111,34 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         resp = self.client.get('/api/v1/presence_weekday/1')
         self.assertEqual(resp.status_code, 404)
 
+    def test_presence_start_end_view(self):
+        """
+        Test api presence start end view for existing user.
+        """
+        resp = self.client.get('/api/v1/presence_start_end/10')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        data = json.loads(resp.data)
+        self.assertListEqual(
+            data,
+            [
+                ['Mon', {'start': 0, 'end': 0}],
+                ['Tue', {'start': 34745.0, 'end': 64792.0}],
+                ['Wed', {'start': 33592.0, 'end': 58057.0}],
+                ['Thu', {'start': 38926.0, 'end': 62631.0}],
+                ['Fri', {'start': 0, 'end': 0}],
+                ['Sat', {'start': 0, 'end': 0}],
+                ['Sun', {'start': 0, 'end': 0}]
+            ]
+        )
+
+    def test_presence_start_end_view_404(self):
+        """
+        Test api presence start end view for unexisting user.
+        """
+        resp = self.client.get('/api/v1/presence_start_end/1')
+        self.assertEqual(resp.status_code, 404)
+
 
 class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
     """
@@ -191,6 +219,25 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         self.assertEqual(utils.mean(items), -2.0)
         items = []
         self.assertEqual(utils.mean(items), 0)
+
+    def test_mean_time_of_presence(self):
+        """
+        Test calculating mean entries for every weekday.
+        """
+        sample_data = utils.get_data()
+        result = utils.mean_time_of_presence(sample_data[10])
+        self.assertDictEqual(
+            result,
+            {
+                0: {'start': 0, 'end': 0},
+                1: {'start': 34745.0, 'end': 64792.0},
+                2: {'start': 33592.0, 'end': 58057.0},
+                3: {'start': 38926.0, 'end': 62631.0},
+                4: {'start': 0, 'end': 0},
+                5: {'start': 0, 'end': 0},
+                6: {'start': 0, 'end': 0}
+            }
+        )
 
 
 def suite():
