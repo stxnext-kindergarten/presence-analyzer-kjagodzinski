@@ -104,3 +104,21 @@ def mean(items):
     Calculates arithmetic mean. Returns zero for empty lists.
     """
     return float(sum(items)) / len(items) if len(items) > 0 else 0
+
+
+def mean_time_of_presence(items):
+    """
+    Calculates mean time of presence.
+    """
+    result = {i: {'start': [], 'end': []} for i in range(7)}
+
+    for date in items:
+        start = items[date]['start']
+        end = items[date]['end']
+        result[date.weekday()]['start'].append(seconds_since_midnight(start))
+        result[date.weekday()]['end'].append(seconds_since_midnight(end))
+
+    for day in result:
+        result[day]['start'] = mean(result[day]['start'])
+        result[day]['end'] = mean(result[day]['end'])
+    return result
