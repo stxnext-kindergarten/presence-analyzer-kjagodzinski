@@ -9,11 +9,13 @@ import json
 import datetime
 import unittest
 
+from jinja2.exceptions import TemplateNotFound
 from presence_analyzer import main, views, utils
 
 
 TEST_DATA_CSV = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_data.csv')
+    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_data.csv'
+)
 
 
 # pylint: disable=maybe-no-member, too-many-public-methods
@@ -74,6 +76,20 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
                 ['Sun', 0],
             ]
         )
+
+    def test_template_for_url(self):
+        """
+        Test correct rendering template for url.
+        """
+        resp = self.client.get('/presence_weekday.html')
+        self.assertEqual(resp.status_code, 200)
+
+    def test_template_for_url_404(self):
+        """
+        Test rendering template for unexisting url.
+        """
+        resp = self.client.get('/xyz')
+        self.assertEqual(resp.status_code, 404)
 
     def test_api_mean_time_404(self):
         """
