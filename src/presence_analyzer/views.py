@@ -2,12 +2,12 @@
 """
 Defines views.
 """
-
 import calendar
 import logging
 
-from flask import abort, render_template, make_response, redirect
-from jinja2.exceptions import TemplateNotFound
+from flask import abort, make_response, redirect
+from flask.ext.mako import render_template
+from mako.exceptions import TopLevelLookupException
 
 from presence_analyzer.main import app
 from presence_analyzer.utils import (
@@ -27,8 +27,8 @@ def template_for_url(template_file):
         template_file = '{}.html'.format(template_file)
 
     try:
-        return render_template(template_file)
-    except TemplateNotFound:
+        return render_template(template_file, template_file=template_file)
+    except TopLevelLookupException:
         return make_response('page not found', 404)
 
 

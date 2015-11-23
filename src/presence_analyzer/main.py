@@ -5,8 +5,10 @@ Flask app initialization.
 import re
 
 from flask import Flask
+from flask.ext.mako import MakoTemplates
 
 app = Flask(__name__)  # pylint: disable=invalid-name
+mako = MakoTemplates(app)
 
 
 @app.template_filter('quoted')

@@ -9,8 +9,7 @@ import json
 import datetime
 import unittest
 
-from jinja2.exceptions import TemplateNotFound
-from presence_analyzer import main, views, utils
+from presence_analyzer import main, utils
 
 
 TEST_DATA_CSV = os.path.join(
@@ -148,7 +147,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
             ]
         )
 
-    def test_presence_start_end_view_404(self):
+    def test_presence_startend_view_404(self):
         """
         Test api presence start end view for unexisting user.
         """
