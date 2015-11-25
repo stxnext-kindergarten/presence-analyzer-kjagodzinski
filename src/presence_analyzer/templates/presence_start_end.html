@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+<%inherit file="base.html"/>
 
-{% block head %}
-    <script src="{{ url_for("static", filename="js/presence_start_end.js") }}"></script>
-{% endblock %}
+<%block name="blockhead">
+    <script src=${url_for("static", filename="js/presence_start_end.js")}></script>
+</%block>
 
-{% block body %}
+<%block name="blockbody">
     <h2>Presence start-end weekday</h2>
-{% endblock %}
+</%block>
