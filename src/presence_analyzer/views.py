@@ -11,7 +11,8 @@ from mako.exceptions import TopLevelLookupException
 
 from presence_analyzer.main import app
 from presence_analyzer.utils import (
-    jsonify, get_data, mean, group_by_weekday, mean_time_of_presence
+    jsonify, get_data, mean, group_by_weekday, mean_time_of_presence,
+    get_data_xml
 )
 
 
@@ -46,11 +47,27 @@ def users_view():
     """
     Users listing for dropdown.
     """
-    data = get_data()
+    data_xml = get_data_xml()
     return [
-        {'user_id': i, 'name': 'User {0}'.format(str(i))}
-        for i in data.keys()
-    ]
+        {
+            'user_id': user_id,
+            'name': data_xml[user_id]['name'],
+            'avatar': data_xml[user_id]['avatar']
+        } for user_id in data_xml]
+
+
+@app.route('/api/v1/user_image/<int:user_id>', methods=['GET'])
+@jsonify
+def user_image_view(user_id):
+    """
+    Return avatar value for selected user.
+    """
+    data_xml = get_data_xml()
+    if user_id not in data_xml:
+        log.debug('User %s not found!', user_id)
+        abort(404)
+
+    return data_xml[user_id]['avatar']
 
 
 @app.route('/api/v1/mean_time_weekday/<int:user_id>', methods=['GET'])

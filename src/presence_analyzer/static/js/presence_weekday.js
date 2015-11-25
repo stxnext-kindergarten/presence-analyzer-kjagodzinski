@@ -13,10 +13,13 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
         });
         $('#user_id').change(function() {
             var selected_user = $('#user_id').val(),
-                chart_div = $('#chart_div');
+                chart_div = $('#chart_div'),
+                no_data = $('#no_data').html('<b>Data not found</b>');
+            no_data.hide();
             if (selected_user) {
                 loading.show();
                 chart_div.hide();
+                getAvatar(selected_user);
                 $.getJSON('/api/v1/presence_weekday/'+selected_user, function(result) {
                     var data = google.visualization.arrayToDataTable(result),
                         options = {};
@@ -24,6 +27,9 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'en'});
                     loading.hide();
                     var chart = new google.visualization.PieChart(chart_div[0]);
                     chart.draw(data, options);
+                }).fail(function() {
+                    loading.hide();
+                    no_data.show();
                 });
             }
         });

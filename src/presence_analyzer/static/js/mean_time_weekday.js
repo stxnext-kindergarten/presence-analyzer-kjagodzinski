@@ -13,10 +13,13 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'pl'});
         });
         $('#user_id').change(function() {
             var selected_user = $('#user_id').val(),
-                chart_div = $('#chart_div');
+                chart_div = $('#chart_div'),
+                no_data = $('#no_data').html('<b>Data not found</b>');
+            no_data.hide();
             if (selected_user) {
                 loading.show();
                 chart_div.hide();
+                getAvatar(selected_user);
                 $.getJSON('/api/v1/mean_time_weekday/'+selected_user, function(result) {
                     $.each(result, function(index, value) {
                         value[1] = parseInterval(value[1]);
@@ -34,6 +37,9 @@ google.load('visualization', '1', {packages:['corechart'], 'language': 'pl'});
                     loading.hide();
                     var chart = new google.visualization.ColumnChart(chart_div[0]);
                     chart.draw(data, options);
+                }).fail(function() {
+                   loading.hide();
+                   no_data.show();
                 });
             }
         });

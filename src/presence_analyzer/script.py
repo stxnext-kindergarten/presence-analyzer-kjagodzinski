@@ -42,7 +42,9 @@ def make_debug(global_conf={}, **conf):
 
 # bin/flask-ctl shell
 def make_shell():
-    """Interactive Flask Shell"""
+    """
+    Interactive Flask Shell.
+    """
     from flask import request
     app = make_app()
     http = app.test_client()
@@ -51,7 +53,9 @@ def make_shell():
 
 
 def _serve(action, debug=False, dry_run=False):
-    """Build paster command from 'action' and 'debug' flag."""
+    """
+    Build paster command from 'action' and 'debug' flag.
+    """
     if debug:
         config = DEBUG_INI
     else:
@@ -97,17 +101,33 @@ def run():
 
     # bin/flask-ctl debug [fg|start|stop|restart|status]
     def action_debug(action=('a', 'start'), dry_run=False):
-        """Serve the debugging application."""
+        """
+        Serve the debugging application.
+        """
         _serve(action, debug=True, dry_run=dry_run)
 
     # bin/flask-ctl status
     def action_status(dry_run=False):
-        """Status of the application."""
+        """
+        Status of the application.
+        """
         _serve('status', dry_run=dry_run)
 
     # bin/flask-ctl stop
     def action_stop(dry_run=False):
-        """Stop the application."""
+        """
+        Stop the application.
+        """
         _serve('stop', dry_run=dry_run)
 
     werkzeug.script.run()
+
+
+def download_xml():
+    """
+    Download xml files from stx website.
+    """
+    import urllib
+
+    url = 'http://sargo.bolt.stxnext.pl/users.xml'
+    urllib.urlretrieve(url, 'runtime/data/users.xml')
