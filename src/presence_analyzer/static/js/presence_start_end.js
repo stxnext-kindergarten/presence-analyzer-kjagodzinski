@@ -13,10 +13,13 @@ google.load('visualization', '1', {packages:['corechart', 'timeline'], 'language
         });
         $('#user_id').change(function() {
             var selected_user = $('#user_id').val(),
-                chart_div = $('#chart_div');
+                chart_div = $('#chart_div'),
+                no_data = $('#no_data').html('<b>Data not found</b>');
+            no_data.hide();
             if (selected_user) {
                 loading.show();
                 chart_div.hide();
+                getAvatar(selected_user);
                 $.getJSON('/api/v1/presence_start_end/'+selected_user, function(result) {
                     var finalresult = [];
                     $.each(result, function(index, value) {
@@ -41,6 +44,9 @@ google.load('visualization', '1', {packages:['corechart', 'timeline'], 'language
                     loading.hide();
                     var chart = new google.visualization.Timeline(chart_div[0]);
                     chart.draw(data, options);
+                }).fail(function() {
+                   loading.hide();
+                   no_data.show();
                 });
             }
         });

@@ -16,6 +16,10 @@ TEST_DATA_CSV = os.path.join(
     os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_data.csv'
 )
 
+TEST_DATA_XML = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'runtime', 'data', 'test_user.xml'
+)
+
 
 # pylint: disable=maybe-no-member, too-many-public-methods
 class PresenceAnalyzerViewsTestCase(unittest.TestCase):
@@ -27,7 +31,12 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         """
         Before each test, set up a environment.
         """
-        main.app.config.update({'DATA_CSV': TEST_DATA_CSV})
+        main.app.config.update(
+            {
+                'DATA_CSV': TEST_DATA_CSV,
+                'DATA_XML': TEST_DATA_XML
+            }
+        )
         self.client = main.app.test_client()
 
     def tearDown(self):
@@ -52,8 +61,14 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.content_type, 'application/json')
         data = json.loads(resp.data)
-        self.assertEqual(len(data), 2)
-        self.assertDictEqual(data[0], {'user_id': 10, 'name': 'User 10'})
+        self.assertDictEqual(
+            data[0],
+            {
+                'user_id': 176,
+                'name': 'Adrian K.',
+                'avatar': 'https://host:443/api/images/users/176'
+            }
+        )
 
     def test_api_mean_time(self):
         """
@@ -147,6 +162,22 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
             ]
         )
 
+    def test_user_image_view(self):
+        """
+        Test api returning user's image for existing user.
+        """
+        resp = self.client.get('/api/v1/user_image/170')
+        self.assertEqual(resp.status_code, 200)
+        data = json.loads(resp.data)
+        self.assertEqual(data, 'https://host:443/api/images/users/170')
+
+    def test_user_image_view_404(self):
+        """
+        Test api returning user's image for unexisting user.
+        """
+        resp = self.client.get('/api/v1/user_image/10')
+        self.assertEqual(resp.status_code, 404)
+
     def test_presence_startend_view_404(self):
         """
         Test api presence start end view for unexisting user.
@@ -164,7 +195,12 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         Before each test, set up a environment.
         """
-        main.app.config.update({'DATA_CSV': TEST_DATA_CSV})
+        main.app.config.update(
+            {
+                'DATA_CSV': TEST_DATA_CSV,
+                'DATA_XML': TEST_DATA_XML
+            }
+        )
 
     def tearDown(self):
         """
@@ -186,6 +222,17 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
             data[10][sample_date]['start'],
             datetime.time(9, 39, 5)
         )
+
+    def test_get_data_xml(self):
+        """
+        Test parsing of XML file.
+        """
+        data = utils.get_data_xml()
+        self.assertIsInstance(data, dict)
+        self.assertItemsEqual(data.keys(), [176, 170, 26, 141])
+        self.assertItemsEqual(data[26].keys(), ['avatar', 'name'])
+        self.assertTrue(data[26]['avatar'].startswith('https://host:443/'))
+        self.assertEqual(data[176]['name'], 'Adrian K.')
 
     def test_group_by_weekday(self):
         """

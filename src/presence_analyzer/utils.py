@@ -11,6 +11,7 @@ from functools import wraps
 from datetime import datetime
 
 from flask import Response
+from lxml import etree
 
 from presence_analyzer.main import app
 
@@ -71,6 +72,38 @@ def get_data():
             data.setdefault(user_id, {})[date] = {'start': start, 'end': end}
 
     return data
+
+
+def get_data_xml():
+    """
+    Get data from xml.
+
+    It creates structure like this:
+    data = {
+        'user_id': {
+                'avatar': 'scheme://server:port/api/images/users/user_id',
+                'name': 'Jan K.',
+                }
+            }
+    """
+    tree = etree.parse(app.config['DATA_XML'])
+    root = tree.getroot()
+    server = root.find('server')
+    users = root.find('users')
+    result = {}
+
+    for user in users:
+        result[int(user.attrib['id'])] = {
+            'avatar': '{protocol}://{serv}:{port}{url}'.format(
+                protocol=server.find('protocol').text,
+                serv=server.find('host').text,
+                port=server.find('port').text,
+                url=user.find('avatar').text
+            ),
+            'name': user.find('name').text
+        }
+
+    return result
 
 
 def group_by_weekday(items):
