@@ -70,25 +70,6 @@ def user_image_view(user_id):
     return data_xml[user_id]['avatar']
 
 
-@app.route('/api/v1/mean_time_weekday/<int:user_id>', methods=['GET'])
-@jsonify
-def mean_time_weekday_view(user_id):
-    """
-    Returns mean presence time of given user grouped by weekday.
-    """
-    data = get_data()
-    if user_id not in data:
-        log.debug('User %s not found!', user_id)
-        abort(404)
-
-    weekdays = group_by_weekday(data[user_id])
-    result = [
-        (calendar.day_abbr[weekday], mean(intervals))
-        for weekday, intervals in enumerate(weekdays)
-    ]
-    return result
-
-
 @app.route('/api/v1/presence_weekday/<int:user_id>', methods=['GET'])
 @jsonify
 def presence_weekday_view(user_id):
@@ -96,6 +77,7 @@ def presence_weekday_view(user_id):
     Returns total presence time of given user grouped by weekday.
     """
     data = get_data()
+
     if user_id not in data:
         log.debug('User %s not found!', user_id)
         abort(404)
@@ -107,6 +89,26 @@ def presence_weekday_view(user_id):
     ]
 
     result.insert(0, ('Weekday', 'Presence (s)'))
+    return result
+
+
+@app.route('/api/v1/mean_time_weekday/<int:user_id>', methods=['GET'])
+@jsonify
+def mean_time_weekday_view(user_id):
+    """
+    Returns mean presence time of given user grouped by weekday.
+    """
+    data = get_data()
+
+    if user_id not in data:
+        log.debug('User %s not found!', user_id)
+        abort(404)
+
+    weekdays = group_by_weekday(data[user_id])
+    result = [
+        (calendar.day_abbr[weekday], mean(intervals))
+        for weekday, intervals in enumerate(weekdays)
+    ]
     return result
 
 
