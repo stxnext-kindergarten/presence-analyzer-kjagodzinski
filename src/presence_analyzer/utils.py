@@ -9,6 +9,8 @@ import logging
 from json import dumps
 from functools import wraps
 from datetime import datetime
+from threading import Lock
+from time import time
 
 from flask import Response
 from lxml import etree
@@ -17,6 +19,35 @@ from presence_analyzer.main import app
 
 
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
+CACHE = {}
+
+
+def memoize(duration):
+    """
+    Decorator to caching data. Set duration in seconds.
+    Return data from cache if exist and not expired.
+    """
+    lock = Lock()
+    def _memoize(function):
+        def __memoize(*args, **kwargs):
+            key = function.__name__
+            now = time()
+
+            with lock:
+                if key in CACHE and CACHE[key]['time'] > now:
+                    return CACHE[key]['value']
+
+                result = function(*args, **kwargs)
+                CACHE[key] = {
+                    'time': now + duration,
+                    'value': result
+                }
+
+            return result
+        return __memoize
+    return _memoize
 
 
 def jsonify(function):
@@ -35,6 +66,7 @@ def jsonify(function):
     return inner
 
 
+@memoize(600)
 def get_data():
     """
     Extracts presence data from CSV file and groups it by user_id.
@@ -74,6 +106,7 @@ def get_data():
     return data
 
 
+@memoize(600)
 def get_data_xml():
     """
     Get data from xml.

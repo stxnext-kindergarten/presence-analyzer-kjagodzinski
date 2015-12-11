@@ -9,6 +9,8 @@ import json
 import datetime
 import unittest
 
+from time import time as tm
+
 from presence_analyzer import main, utils
 
 
@@ -38,6 +40,7 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
             }
         )
         self.client = main.app.test_client()
+        utils.CACHE = {}
 
     def tearDown(self):
         """
@@ -233,6 +236,25 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         self.assertItemsEqual(data[26].keys(), ['avatar', 'name'])
         self.assertTrue(data[26]['avatar'].startswith('https://host:443/'))
         self.assertEqual(data[176]['name'], 'Adrian K.')
+
+    def test_memoize(self):
+        """
+        Test memorize data and updating if expired.
+        """
+        utils.get_data()
+        self.assertIn('get_data', utils.CACHE)
+        self.assertIn('value', utils.CACHE['get_data'])
+        self.assertIn('time', utils.CACHE['get_data'])
+        utils.CACHE['get_data']['time'] = 0
+        utils.get_data()
+        self.assertNotEqual(utils.CACHE['get_data']['time'], 0)
+        utils.get_data_xml()
+        self.assertEqual(len(utils.CACHE), 2)
+        self.assertIn('get_data_xml', utils.CACHE)
+        future_time = tm() + 100
+        utils.CACHE['get_data'] = {'time': future_time, 'value': 'test'}
+        utils.get_data()
+        self.assertEqual(utils.CACHE['get_data']['value'], 'test')
 
     def test_group_by_weekday(self):
         """
