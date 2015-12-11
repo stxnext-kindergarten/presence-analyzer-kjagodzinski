@@ -1,7 +1,8 @@
 <%  navigation_bar = [
         ("presence_weekday.html", "Presence by weekday"),
         ("mean_time_weekday.html", "Presence mean time"),
-        ("presence_start_end.html", "Presence start-end")
+        ("presence_start_end.html", "Presence start-end"),
+        ("top_5_monthly_workers.html", "Top 5 monthly workers")
     ]
 %>
 
@@ -47,11 +48,11 @@
                 <select id="user_id" style="display: none">
                     <option value="">--</option>
                 </select>
-                <div id="avatar">
+                <div id="avatar" style="display: none">
                 </div>
                 <div id="chart_div" style="display: none">
                 </div>
-                <div id="no_data" style="display:none">
+                <div id="no_data" style="display: none">
                 </div>
                 <div id="loading">
                     <img src=${url_for("static", filename="img/loading.gif")} />

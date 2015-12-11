@@ -22,5 +22,13 @@
             <avatar>/api/images/users/26</avatar>
             <name>Andrzej S.</name>
         </user>
+        <user id="10">
+            <avatar>/api/images/users/10</avatar>
+            <name>Maciej Z.</name>
+        </user>
+        <user id="11">
+            <avatar>/api/images/users/11</avatar>
+            <name>Maciej D.</name>
+        </user>
     </users>
 </intranet>

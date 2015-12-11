@@ -1,0 +1,16 @@
+<%inherit file="base.html"/>
+
+<%block name="blockhead">
+    <script src=${url_for("static", filename="js/top_5_monthly_workers.js")}></script>
+</%block>
+
+<%block name="blockbody">
+    <h2>Top 5 monthly workers by mean time</h2>
+    <p>
+    <select id="month" style="display: none">
+        <option value="">--</option>
+    </select>
+    <div id="avatar" class="avatars" style="display: none">
+    </div>
+    </p>
+</%block>

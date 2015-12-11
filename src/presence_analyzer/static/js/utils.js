@@ -5,7 +5,9 @@ function parseInterval(value) {
 }
 
 function getAvatar(user_id) {
+    $('#avatar').empty();
     $.getJSON('/api/v1/user_image/'+user_id, function(img_url) {
-        $('#avatar').html('<img src="'+ img_url +'" width=100 height=100/>');
+        $('#avatar').append('<img src="'+ img_url +'" />');
+        $('#avatar').show();
     });
 }

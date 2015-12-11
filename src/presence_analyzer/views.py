@@ -6,13 +6,13 @@ import calendar
 import logging
 
 from flask import abort, make_response, redirect
-from flask.ext.mako import render_template
+from flask.ext.mako import render_template  # pylint: disable=import-error
 from mako.exceptions import TopLevelLookupException
 
 from presence_analyzer.main import app
 from presence_analyzer.utils import (
     jsonify, get_data, mean, group_by_weekday, mean_time_of_presence,
-    get_data_xml
+    get_data_xml, mean_by_month
 )
 
 
@@ -54,6 +54,49 @@ def users_view():
             'name': data_xml[user_id]['name'],
             'avatar': data_xml[user_id]['avatar']
         } for user_id in data_xml]
+
+
+@app.route('/api/v1/months', methods=['GET'])
+@jsonify
+def months_view():
+    """
+    Months listing for dropdown.
+    """
+    return [
+        {
+            'month': month,
+            'name': calendar.month_name[month]
+        } for month in range(1, 13)
+    ]
+
+
+@app.route('/api/v1/top5monthly/<month>', methods=['GET'])
+@jsonify
+def presence_top_5_users_monthly_view(month):  # pylint: disable=invalid-name
+    """
+    Return 5 users from top of mean presence by month.
+    """
+    months = calendar.month_name[1:]
+    if month not in months:
+        abort(404)
+    data_xml = get_data_xml()
+    data = get_data()
+    result = []
+    for user_id in data_xml:
+        result.append(
+            {
+                'user_id': user_id,
+                'name': data_xml[user_id]['name'],
+                'mean': mean_by_month(
+                    data.get(user_id, [])
+                    )[months.index(month)],
+            }
+        )
+    return sorted(
+        result,
+        key=lambda sort_by: sort_by['mean'],
+        reverse=True
+    )[:5]
 
 
 @app.route('/api/v1/user_image/<int:user_id>', methods=['GET'])

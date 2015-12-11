@@ -4,12 +4,13 @@ body {
 }
 
 #main {
-    width: 800px;
+    width: 904px;
     margin: 2em auto;
     padding: 0 2em;
 }
 
 #content {
+    height: 860px;
     padding: 0 2em;
     border: 1px solid #AAA;
     background-color: #FFF;
@@ -22,6 +23,7 @@ body {
 #chart_div {
     width: 750px;
     height: 750px;
+    float: left;
 }
 
 #header ul {
@@ -39,7 +41,7 @@ body {
 
 #header a {
     text-decoration: none;
-    display: block;
+    display: inline-block;
     background: #eee;
     padding: 0.24em 1em;
     color: #00c;
@@ -61,4 +63,21 @@ body {
     background: white;
     color: black;
     font-weight: bold;
+}
+
+#avatar {
+    float: left;
+    display: inline-block;
+}
+
+#avatar img{
+    display: block;
+    width: 100px;
+    height: 100px;
+}
+
+#avatar.avatars img{
+    display: block;
+    width: 41px;
+    height: 41px;
 }
