@@ -67,10 +67,36 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertDictEqual(
             data[0],
             {
-                'user_id': 176,
-                'name': 'Adrian K.',
-                'avatar': 'https://host:443/api/images/users/176'
+                'user_id': 10,
+                'name': 'Maciej Z.',
+                'avatar': 'https://host:443/api/images/users/10'
             }
+        )
+
+    def test_month_dropdown(self):
+        """
+        Test months listing.
+        """
+        resp = self.client.get('/api/v1/months')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        data = json.loads(resp.data)
+        self.assertListEqual(
+            data,
+            [
+                {'name': 'January', 'month': 1},
+                {'name': 'February', 'month': 2},
+                {'name': 'March', 'month': 3},
+                {'name': 'April', 'month': 4},
+                {'name': 'May', 'month': 5},
+                {'name': 'June', 'month': 6},
+                {'name': 'July', 'month': 7},
+                {'name': 'August', 'month': 8},
+                {'name': 'September', 'month': 9},
+                {'name': 'October', 'month': 10},
+                {'name': 'November', 'month': 11},
+                {'name': 'December', 'month': 12}
+            ]
         )
 
     def test_api_mean_time(self):
@@ -165,6 +191,13 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
             ]
         )
 
+    def test_presence_startend_view_404(self):
+        """
+        Test api presence start end view for unexisting user.
+        """
+        resp = self.client.get('/api/v1/presence_start_end/1')
+        self.assertEqual(resp.status_code, 404)
+
     def test_user_image_view(self):
         """
         Test api returning user's image for existing user.
@@ -178,14 +211,31 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         """
         Test api returning user's image for unexisting user.
         """
-        resp = self.client.get('/api/v1/user_image/10')
+        resp = self.client.get('/api/v1/user_image/999')
         self.assertEqual(resp.status_code, 404)
 
-    def test_presence_startend_view_404(self):
+    def test_presence_top_5_users_monthly_view(self):
+        # pylint: disable=invalid-name
         """
-        Test api presence start end view for unexisting user.
+        Test api returning top 5 users for month depend on mean monthly time.
         """
-        resp = self.client.get('/api/v1/presence_start_end/1')
+        resp = self.client.get('/api/v1/top5monthly/September')
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'application/json')
+        data = json.loads(resp.data)
+        self.assertEqual(len(data), 5)
+        self.assertEqual(data[0]['mean'], 26072.333333333332)
+        self.assertGreaterEqual(data[0]['mean'], data[1]['mean'])
+        self.assertGreaterEqual(data[1]['mean'], data[2]['mean'])
+        self.assertGreaterEqual(data[2]['mean'], data[3]['mean'])
+        self.assertGreaterEqual(data[3]['mean'], data[4]['mean'])
+
+    def test_presence_top_5_users_monthly_view_404(self):
+        # pylint: disable=invalid-name
+        """
+        Test api returning 404 error for unexisting month.
+        """
+        resp = self.client.get('/api/v1/month/14')
         self.assertEqual(resp.status_code, 404)
 
 
@@ -232,7 +282,7 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
         """
         data = utils.get_data_xml()
         self.assertIsInstance(data, dict)
-        self.assertItemsEqual(data.keys(), [176, 170, 26, 141])
+        self.assertItemsEqual(data.keys(), [10, 11, 176, 170, 26, 141])
         self.assertItemsEqual(data[26].keys(), ['avatar', 'name'])
         self.assertTrue(data[26]['avatar'].startswith('https://host:443/'))
         self.assertEqual(data[176]['name'], 'Adrian K.')
@@ -321,6 +371,22 @@ class PresenceAnalyzerUtilsTestCase(unittest.TestCase):
                 5: {'start': 0, 'end': 0},
                 6: {'start': 0, 'end': 0}
             }
+        )
+
+    def test_mean_by_month(self):
+        """
+        Test grouping mean time at work by month.
+        """
+        data = utils.get_data()
+        sample_data_user = data[10]
+        result = utils.mean_by_month(sample_data_user)
+        self.assertListEqual(
+            result,
+            [
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                26072.333333333332, 0, 0, 0
+            ]
         )
 
 

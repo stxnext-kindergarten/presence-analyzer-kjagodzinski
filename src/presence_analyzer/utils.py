@@ -30,8 +30,9 @@ def memoize(duration):
     Return data from cache if exist and not expired.
     """
     lock = Lock()
-    def _memoize(function):
-        def __memoize(*args, **kwargs):
+
+    def _memoize(function):  # pylint: disable=missing-docstring
+        def __memoize(*args, **kwargs):  # pylint: disable=missing-docstring
             key = function.__name__
             now = time()
 
@@ -119,7 +120,7 @@ def get_data_xml():
                 }
             }
     """
-    tree = etree.parse(app.config['DATA_XML'])
+    tree = etree.parse(app.config['DATA_XML'])  # pylint: disable=no-member
     root = tree.getroot()
     server = root.find('server')
     users = root.find('users')
@@ -151,11 +152,26 @@ def group_by_weekday(items):
     return result
 
 
-def seconds_since_midnight(time):
+def mean_by_month(items):
+    """
+    Groups mean presence by month.
+    """
+    result = [[] for _ in range(12)]
+    for date in items:
+        start = items[date]['start']
+        end = items[date]['end']
+        result[date.month-1].append(interval(start, end))
+    return [mean(intervals) for intervals in result]
+
+
+def seconds_since_midnight(time_to_calc):
     """
     Calculates amount of seconds since midnight.
     """
-    return time.hour * 3600 + time.minute * 60 + time.second
+    return (
+        time_to_calc.hour * 3600 + time_to_calc.minute * 60 +
+        time_to_calc.second
+    )
 
 
 def interval(start, end):
