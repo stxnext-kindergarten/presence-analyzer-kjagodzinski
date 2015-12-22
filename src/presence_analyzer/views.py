@@ -4,6 +4,7 @@ Defines views.
 """
 import calendar
 import logging
+import locale
 
 from flask import abort, make_response, redirect
 from flask.ext.mako import render_template  # pylint: disable=import-error
@@ -48,12 +49,19 @@ def users_view():
     Users listing for dropdown.
     """
     data_xml = get_data_xml()
-    return [
+    result = [
         {
             'user_id': user_id,
             'name': data_xml[user_id]['name'],
             'avatar': data_xml[user_id]['avatar']
-        } for user_id in data_xml]
+        } for user_id in data_xml
+    ]
+    locale.setlocale(locale.LC_COLLATE, 'pl_PL.UTF-8')
+    return sorted(
+        result,
+        cmp=locale.strcoll,
+        key=lambda sort_by: sort_by['name']
+    )
 
 
 @app.route('/api/v1/months', methods=['GET'])

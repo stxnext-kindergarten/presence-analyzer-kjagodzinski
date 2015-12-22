@@ -64,12 +64,16 @@ class PresenceAnalyzerViewsTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.content_type, 'application/json')
         data = json.loads(resp.data)
+        self.assertListEqual(
+            data,
+            sorted(data, key=lambda sort_by: sort_by['name'])
+        )
         self.assertDictEqual(
             data[0],
             {
-                'user_id': 10,
-                'name': 'Maciej Z.',
-                'avatar': 'https://host:443/api/images/users/10'
+                'user_id': 141,
+                'name': 'Adam P.',
+                'avatar': 'https://host:443/api/images/users/141'
             }
         )
 
