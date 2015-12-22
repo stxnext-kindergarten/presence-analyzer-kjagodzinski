@@ -19,10 +19,12 @@ google.load('visualization', '1', {packages:['corechart', 'timeline'], 'language
             if (selected_month) {
                 loading.show();
                 chart_div.hide();
-                $('#avatars').empty()
+                $('#avatar').empty()
                 $.getJSON('/api/v1/top5monthly/'+selected_month, function(result) {
                     var finalresult = [];
                     $.each(result, function(index, value) {
+                        $('#avatar').append('<img src="'+ value['avatar'] +'" />');
+                        $('#avatar').show();
                         finalresult.push([
                             value['name'],
                             /**
@@ -32,7 +34,6 @@ google.load('visualization', '1', {packages:['corechart', 'timeline'], 'language
                             parseInterval(32400),
                             parseInterval(value['mean']+32400)
                         ]);
-                        getAvatar(value['user_id']);
                     });
                     var data = new google.visualization.DataTable();
                     data.addColumn({type: 'string', id:'User'});
