@@ -85,6 +85,7 @@ def presence_top_5_users_monthly_view(month):  # pylint: disable=invalid-name
     for user_id in data_xml:
         result.append(
             {
+                'avatar': data_xml[user_id]['avatar'],
                 'user_id': user_id,
                 'name': data_xml[user_id]['name'],
                 'mean': mean_by_month(
